@@ -1,11 +1,12 @@
-import express, { Request, Response } from "express";
+import express, { Express } from "express";
+import { routes } from "./routes";
 
-const app = express();
+const app: Express = express();
 
-app.get("/", (req: Request, res: Response) => {
-  return res.json({
-    status: "success!!",
-  });
+app.use("/", routes());
+
+app.listen(process.env.PORT || 8080, () => {
+  console.log("App running on port 8080...");
 });
 
-app.listen(8080, () => console.log("listening on port 8080"));
+export default app;
