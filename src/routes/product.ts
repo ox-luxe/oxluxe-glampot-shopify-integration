@@ -1,11 +1,10 @@
 import express from "express";
-
+import { validateWebhookSource } from "../middleware/validateWebhook";
 import { productControllers } from "../controllers/productControllers";
 const router = express.Router();
 
 function productRoute() {
-  // need to verify authenticity of webhook's origin (i.e. if webhook data came from glampot)
-  router.route("/glampot").post(productControllers.createNewProduct);
+  router.route("/glampot").post(validateWebhookSource, productControllers.createNewProduct);
   return router;
 }
 
