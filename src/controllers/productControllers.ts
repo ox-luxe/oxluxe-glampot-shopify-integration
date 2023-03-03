@@ -11,7 +11,7 @@ async function createNewProduct(req: Request, res: Response) {
     }
 
     if (process.env.NODE_ENV === "production") {
-      productData = Buffer.from(pubSubMessage.data, "base64").toJSON().data;
+      productData = JSON.parse(Buffer.from(pubSubMessage.data, "base64").toString());
     }
     console.log(productData);
     res.status(204).send();
