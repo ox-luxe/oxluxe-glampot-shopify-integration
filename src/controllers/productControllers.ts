@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 async function createNewProduct(req: Request, res: Response) {
   try {
+    console.log(req);
     if (!req.body) {
       const msg = "no Pub/Sub message received";
       console.error(`error: ${msg}`);
