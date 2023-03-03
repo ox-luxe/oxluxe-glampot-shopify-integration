@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 async function createNewProduct(req: Request, res: Response) {
   try {
-    console.log(req);
     if (!req.body) {
       const msg = "no Pub/Sub message received";
       console.error(`error: ${msg}`);
@@ -17,12 +16,13 @@ async function createNewProduct(req: Request, res: Response) {
     }
 
     const pubSubMessage = req.body.message;
+    console.log(pubSubMessage);
+    console.log(Buffer.from(pubSubMessage.data, "base64"));
     
     const name = pubSubMessage.data
       ? Buffer.from(pubSubMessage.data, "base64").toString().trim()
       : "World";
 
-    console.log(Buffer.from(pubSubMessage.data, "base64"));
     console.log(`Hello ${name}!`);
     res.status(204).send();
   } catch (error) {
