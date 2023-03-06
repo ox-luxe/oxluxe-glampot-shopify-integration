@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ShopifyStore } from "../services/ShopifyStore";
 
 async function createNewProduct(req: Request, res: Response) {
   try {
@@ -13,7 +14,13 @@ async function createNewProduct(req: Request, res: Response) {
     if (process.env.NODE_ENV === "production") {
       productData = JSON.parse(Buffer.from(pubSubMessage.data, "base64").toString());
     }
-    console.log(productData);
+    
+    const shouldSyncProductToGlampot = ShopifyStore.doesProductCreateWebhookContainTag(productData, "Glampot");
+
+    if (shouldSyncProductToGlampot) {
+      console.log("Processing data..");
+    }
+    
     res.status(204).send();
   } catch (error) {
     console.log(error);
