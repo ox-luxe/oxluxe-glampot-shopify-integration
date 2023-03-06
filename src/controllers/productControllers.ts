@@ -21,14 +21,20 @@ async function createNewProduct(req: Request, res: Response) {
 
     if (shouldSyncProductToGlampot) {
       console.log("Processing data..");
-      console.log(productData);
-      
-      const shopifyStore = new ShopifyStore(
+
+      const glampotShopifyStore = new ShopifyStore(
         process.env.GLAMPOT_STORE_NAME!,
         process.env.GLAMPOT_STORE_ACCESS_TOKEN!
       );
 
-      await shopifyStore.createProduct(productData);
+      // seperately fetching cost information from origin store as it is not included inside webhook
+      const oxluxeShopifyStore = new ShopifyStore(
+        process.env.OXLUXE_STORE_NAME!,
+        process.env.OXLUXE_STORE_ACCESS_TOKEN!
+      );
+      const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productData);      
+      const productCost = await oxluxeShopifyStore.findCostOfProductByVariantId(variantId);
+      await glampotShopifyStore.createProduct({ ...productData, productCost });
     }
 
     res.status(204).send();
