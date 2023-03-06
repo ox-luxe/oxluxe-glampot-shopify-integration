@@ -21,7 +21,8 @@ async function createNewProduct(req: Request, res: Response) {
 
     if (shouldSyncProductToGlampot) {
       console.log("Processing data..");
-
+      console.log(productData);
+      
       const shopifyStore = new ShopifyStore(
         process.env.GLAMPOT_STORE_NAME!,
         process.env.GLAMPOT_STORE_ACCESS_TOKEN!
