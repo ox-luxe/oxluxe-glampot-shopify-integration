@@ -15,7 +15,7 @@ export class ShopifyStore {
     this.accessToken = accessToken;
   }
 
-  static doesProductCreateWebhookContainTag(  
+  static doesProductWebhookContainTag(  
     webhookData: ProductCreateWebhook,
     tag: string
   ) {
