@@ -50,7 +50,7 @@ async function updateProduct(req: Request, res: Response) {
       const correspondingGlampotProductId = await glampotShopifyStore.findProductIdBySku(sku);
       
       // we have to find corresponding product Id on Glampot's store then pass it into the update Product function
-      await glampotShopifyStore.updateProduct({ ...productWebhook, productCost });
+      await glampotShopifyStore.updateProduct({ ...productWebhook, productCost, correspondingGlampotProductId });
     
     res.status(204).send();
   } catch (error) {

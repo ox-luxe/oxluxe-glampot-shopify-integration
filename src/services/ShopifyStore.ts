@@ -3,6 +3,7 @@ import Shopify from "@shopify/shopify-api";
 
 interface ProductData extends ProductCreateWebhook {
   productCost: string;
+  correspondingGlampotProductId?: string;
 }
 
 export class ShopifyStore {
@@ -123,6 +124,9 @@ export class ShopifyStore {
   async updateProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
     const productAttributes = this.convertProductWebhookIntoProductInput(productData);
+
+    // we want to update corresponding glampot product and not the origin product, hence updating the product id attribute. 
+    productAttributes.id = productData.correspondingGlampotProductId!;
     
     try {
       const res = await client.query({
