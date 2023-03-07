@@ -21,7 +21,7 @@ export class ShopifyStore {
     return webhookData.tags
       .split(",")
       .map((x) => x.toLowerCase().trim())
-      .includes("glampot");
+      .includes(tag);
   }
 
   static getVariantIdFromProductCreateWebhook(
