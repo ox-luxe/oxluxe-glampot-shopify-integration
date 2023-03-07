@@ -3,23 +3,7 @@ import { ShopifyStore } from "../services/ShopifyStore";
 
 async function createNewProduct(req: Request, res: Response) {
   try {
-    const pubSubMessage = req.body.message;
-    let productWebhook;
-
-    if (process.env.NODE_ENV === "development") {
-      productWebhook = pubSubMessage.data;
-    }
-
-    if (process.env.NODE_ENV === "production") {
-      productWebhook = JSON.parse(
-        Buffer.from(pubSubMessage.data, "base64").toString()
-      );
-    }
-
-    const shouldSyncProductToGlampot = ShopifyStore.doesProductCreateWebhookContainTag(productWebhook, "Glampot");
-    
-    if (shouldSyncProductToGlampot) {
-      console.log("Processing product/create webhook..");
+      let productWebhook = res.locals.productWebhook;
 
       const glampotShopifyStore = new ShopifyStore(
         process.env.GLAMPOT_STORE_NAME!,
@@ -35,8 +19,7 @@ async function createNewProduct(req: Request, res: Response) {
       const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productWebhook);    
       const productCost = await oxluxeShopifyStore.findCostOfProductByVariantId(variantId);
       await glampotShopifyStore.createProduct({ ...productWebhook, productCost });
-    }
-
+    
     res.status(204).send();
   } catch (error) {
     console.log(error);

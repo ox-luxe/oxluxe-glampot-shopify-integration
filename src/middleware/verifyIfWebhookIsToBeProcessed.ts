@@ -18,6 +18,9 @@ export async function verifyIfWebhookIsToBeProcessed(req: Request, res: Response
 
     const shouldSyncProductToGlampot = ShopifyStore.doesProductCreateWebhookContainTag(productWebhook, "Glampot");
     if (shouldSyncProductToGlampot) {
+      res.locals.productWebhook = productWebhook;
+
+      console.log("Processing product/create webhook..");
       return next();
     }
     res.status(204).send();
