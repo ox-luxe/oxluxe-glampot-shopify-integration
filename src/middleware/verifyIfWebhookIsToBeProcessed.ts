@@ -6,6 +6,9 @@ export async function verifyIfWebhookIsToBeProcessed(req: Request, res: Response
     const pubSubMessage = req.body.message;
     let productWebhook;
 
+    console.log(productWebhook);
+    
+
     if (process.env.NODE_ENV === "development") {
       productWebhook = pubSubMessage.data;
     }
