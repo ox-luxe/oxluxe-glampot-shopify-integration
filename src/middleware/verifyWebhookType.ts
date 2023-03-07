@@ -17,7 +17,7 @@ export async function verifyWebhookType(
     const correspondingGlampotProductId = await glampotShopifyStore.findProductIdBySku(sku);
     const hasGlampotTag = ShopifyStore.doesProductWebhookContainTag(productWebhook, "Glampot");
     
-    console.log(productWebhook.title);
+    console.log(productWebhook.title + " sku: " + sku);
     console.log(correspondingGlampotProductId);
     console.log(hasGlampotTag);
 
