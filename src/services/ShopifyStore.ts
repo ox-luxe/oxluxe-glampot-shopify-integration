@@ -60,21 +60,25 @@ export class ShopifyStore {
 
   async findCostOfProductByVariantId(productVariantId: string) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
+    console.log(productVariantId);
 
+    const QUERY_STRING = `{
+      productVariant(id: "gid://shopify/ProductVariant/${productVariantId}") {
+              title
+              createdAt
+              inventoryItem {
+              unitCost {
+                  amount
+              }
+          }
+      }
+  }`
+  console.log(QUERY_STRING);
+  
     try {
       const res = await client.query({
         data: {
-          query: `{
-                productVariant(id: "gid://shopify/ProductVariant/${productVariantId}") {
-                        title
-                        createdAt
-                        inventoryItem {
-                        unitCost {
-                            amount
-                        }
-                    }
-                }
-            }`,
+          query: QUERY_STRING,
         },
       });
       // @ts-ignore
