@@ -14,10 +14,7 @@ function productRoute() {
 
   router
   .route("/glampot/update")
-  .post((req, res) => {
-    console.log(req.body);
-    res.status(204).send();
-  })
+  .post(verifyPubsubMessage, productControllers.updateProduct)
   return router;
 }
 

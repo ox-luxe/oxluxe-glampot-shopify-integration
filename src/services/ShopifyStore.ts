@@ -30,10 +30,11 @@ export class ShopifyStore {
     return webhookData.variants[0].id;
   }
 
-  convertProductCreateWebhookIntoProductInput(productData: ProductData) {
-    const { title, body_html, vendor, product_type, status, tags, images, variants, productCost } = productData;
-    
-    return {
+  convertProductWebhookIntoProductInput(productData: ProductData) {
+    const { title, body_html, vendor, product_type, status, tags, images, variants, productCost, id } = productData;
+
+    let productInput = {
+      id: `gid://shopify/Product/${id}`, // this id exists for productUpdates
       title: title,
       descriptionHtml: body_html,
       productType: product_type,
@@ -56,6 +57,7 @@ export class ShopifyStore {
         }
       }),
     };
+    return productInput;
   }
 
   async findCostOfProductByVariantId(productVariantId: string) {
@@ -88,8 +90,7 @@ export class ShopifyStore {
   }
   async createProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
-    const productAttributes =
-      this.convertProductCreateWebhookIntoProductInput(productData);
+    const productAttributes = this.convertProductWebhookIntoProductInput(productData);
 
     try {
       const res = await client.query({
@@ -111,6 +112,30 @@ export class ShopifyStore {
       
     } catch (error) {
       console.log(error);
+    }
+  }
+  async updateProduct(productData: ProductData) {
+    const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
+    const productAttributes = this.convertProductWebhookIntoProductInput(productData);
+
+    try {
+      const res = await client.query({
+        data: {
+          query: `mutation productUpdate($input: ProductInput!) {
+            productUpdate(input: $input) {
+              product {
+                title
+                id
+              }
+            }
+          }`,
+          variables: {
+            input: productAttributes,
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);     
     }
   }
 }
