@@ -58,7 +58,7 @@ export class ShopifyStore {
           inventoryManagement: variant.inventory_management.toUpperCase(),
           inventoryItem: { cost: productCost, tracked: true },
           inventoryQuantities: {
-            availableQuantity: 1,
+            availableQuantity: variant.inventory_quantity,
             locationId: `gid://shopify/Location/${process.env.GLAMPOT_STORE_LOCATION_ID}`,          
           }
         }
@@ -175,6 +175,9 @@ export class ShopifyStore {
       });
       // @ts-ignore
       const productId: string = res.body.data.productVariants.edges[0].node.product.id;
+
+      console.log();
+      
       return productId;
     } catch (error) {
       console.log(error);
