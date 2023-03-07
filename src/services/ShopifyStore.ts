@@ -31,30 +31,30 @@ export class ShopifyStore {
   }
 
   convertProductCreateWebhookIntoProductInput(productData: ProductData) {
+    const { title, body_html, vendor, product_type, status, tags, images, variants, productCost } = productData;
+    
     return {
-      title: "Example T-Shirt!!",
-      descriptionHtml: "<h1>An example T-Shirt<h1>",
-      productType: "Shirts",
-      vendor: "Acme",
-      status: "DRAFT",
-      tags: ["Ox Luxe's Product"],
-      images: [
-        {
-          src: "https://cdn.shopify.com/shopifycloud/shopify/assets/shopify_shirt-39bb555874ecaeed0a1170417d58bbcf792f7ceb56acfe758384f788710ba635.png",
-        },
-      ],
-      variants: [
-        {
-          price: "19.99",
-          sku: "example-shirt-s",
-          inventoryManagement: "SHOPIFY",
-          inventoryItem: { cost: productData.productCost, tracked: true },
+      title: title,
+      descriptionHtml: body_html,
+      productType: product_type,
+      vendor: vendor,
+      status: status.toUpperCase(),
+      tags: [tags],
+      images: images.map(function(img) {
+        return { src: img.src }
+       }),
+      variants: variants.map(function(variant) {
+        return {
+          price: variant.price,
+          sku: variant.sku,
+          inventoryManagement: variant.inventory_management.toUpperCase(),
+          inventoryItem: { cost: productCost, tracked: true },
           inventoryQuantities: {
             availableQuantity: 1,
-            locationId: `gid://shopify/Location/${process.env.GLAMPOT_STORE_LOCATION_ID}`,
-          },
-        },
-      ],
+            locationId: `gid://shopify/Location/${process.env.GLAMPOT_STORE_LOCATION_ID}`,          
+          }
+        }
+      }),
     };
   }
 
@@ -105,7 +105,7 @@ export class ShopifyStore {
           },
         },
       });
-      console.log(res.body);
+      // console.log(res.body);
       
     } catch (error) {
       console.log(error);
