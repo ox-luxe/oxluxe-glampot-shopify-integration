@@ -117,7 +117,8 @@ export class ShopifyStore {
   async updateProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
     const productAttributes = this.convertProductWebhookIntoProductInput(productData);
-
+    console.log(productAttributes);
+    
     try {
       const res = await client.query({
         data: {
@@ -134,6 +135,8 @@ export class ShopifyStore {
           },
         },
       });
+      console.log();
+      
     } catch (error) {
       console.log(error);     
     }
