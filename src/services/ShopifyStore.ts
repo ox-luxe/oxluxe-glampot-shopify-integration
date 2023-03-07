@@ -174,9 +174,7 @@ export class ShopifyStore {
         },
       });
       // @ts-ignore
-      const productId: string = res.body.data.productVariants.edges[0].node.product.id;
-
-      console.log();
+      const productId: string = res.body.data.productVariants.edges[0]?.node.product.id;
       
       return productId;
     } catch (error) {
