@@ -14,7 +14,7 @@ export class ShopifyStore {
     this.accessToken = accessToken;
   }
 
-  static doesProductCreateWebhookContainTag(
+  static doesProductCreateWebhookContainTag(  
     webhookData: ProductCreateWebhook,
     tag: string
   ) {
@@ -28,6 +28,12 @@ export class ShopifyStore {
     webhookData: ProductCreateWebhook
   ) {
     return webhookData.variants[0].id;
+  }
+
+  static getSkuNumberFromProductWebhook(
+    webhookData: ProductCreateWebhook
+  ) {
+    return webhookData.variants[0].sku;
   }
 
   convertProductWebhookIntoProductInput(productData: ProductData) {
@@ -117,7 +123,6 @@ export class ShopifyStore {
   async updateProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
     const productAttributes = this.convertProductWebhookIntoProductInput(productData);
-    console.log(productAttributes);
     
     try {
       const res = await client.query({
@@ -138,6 +143,37 @@ export class ShopifyStore {
       
     } catch (error) {
       console.log(error);     
+    }
+  }
+  async findProductIdBySku(skuNumber: string) {
+    const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
+    const QUERY_STRING = `{
+      productVariants(first: 1, query: "${skuNumber}") {
+        edges {
+          node {
+            id
+            product {
+              id
+            }
+            inventoryItem {
+              id
+            }
+          }
+        }
+      }
+    }`
+ 
+    try {
+      const res = await client.query({
+        data: {
+          query: QUERY_STRING,
+        },
+      });
+      // @ts-ignore
+      const productId: string = res.body.data.productVariants.edges[0].node.product.id;
+      return productId;
+    } catch (error) {
+      console.log(error);
     }
   }
 }
