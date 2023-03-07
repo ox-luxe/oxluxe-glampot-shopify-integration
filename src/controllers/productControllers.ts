@@ -33,9 +33,6 @@ async function createNewProduct(req: Request, res: Response) {
       );
         
       const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productWebhook);    
-      
-      console.log("variant ID: "+variantId);
-      
       const productCost = await oxluxeShopifyStore.findCostOfProductByVariantId(variantId);
       await glampotShopifyStore.createProduct({ ...productWebhook, productCost });
     }
