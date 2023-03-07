@@ -1,7 +1,11 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { ShopifyStore } from "../services/ShopifyStore";
 
-async function createNewProduct(req: Request, res: Response) {
+async function createNewProduct(req: Request, res: Response, next: NextFunction) {
+  if (res.locals.productWebhookType !== "create") {
+    return next();
+  }
+
   try {
       let productWebhook = res.locals.productWebhook;
 
@@ -27,7 +31,11 @@ async function createNewProduct(req: Request, res: Response) {
   }
 }
 
-async function updateProduct(req: Request, res: Response) {
+async function updateProduct(req: Request, res: Response, next: NextFunction) {
+  if (res.locals.productWebhookType !== "update") {
+    return next();
+  }
+
   try {
       let productWebhook = res.locals.productWebhook;
 
@@ -41,15 +49,10 @@ async function updateProduct(req: Request, res: Response) {
         process.env.OXLUXE_STORE_ACCESS_TOKEN!
       );
       
-      const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productWebhook);  
-      const sku = ShopifyStore.getSkuNumberFromProductWebhook(productWebhook);  
-
-      // we need product cost as it is not included in webhook for updating any changes
+      const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productWebhook);
       const productCost = await oxluxeShopifyStore.findCostOfProductByVariantId(variantId);
-      // we need corresponding GlampotProductId to update those changes to the corresponding product in Glampot store.
-      const correspondingGlampotProductId = await glampotShopifyStore.findProductIdBySku(sku);
+      const correspondingGlampotProductId = res.locals.correspondingGlampotProductId;
       
-      // we have to find corresponding product Id on Glampot's store then pass it into the update Product function
       await glampotShopifyStore.updateProduct({ ...productWebhook, productCost, correspondingGlampotProductId });
     
     res.status(204).send();
