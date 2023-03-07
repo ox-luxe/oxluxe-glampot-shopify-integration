@@ -6,9 +6,6 @@ export async function verifyIfWebhookIsToBeProcessed(req: Request, res: Response
     const pubSubMessage = req.body.message;
     let productWebhook;
 
-    console.log(productWebhook);
-    
-
     if (process.env.NODE_ENV === "development") {
       productWebhook = pubSubMessage.data;
     }
@@ -22,8 +19,7 @@ export async function verifyIfWebhookIsToBeProcessed(req: Request, res: Response
     const shouldSyncProductToGlampot = ShopifyStore.doesProductCreateWebhookContainTag(productWebhook, "Glampot");
     if (shouldSyncProductToGlampot) {
       res.locals.productWebhook = productWebhook;
-
-      console.log("Processing product/create webhook..");
+      console.log("Processing product webhook for url: " + req.originalUrl);
       return next();
     }
     res.status(204).send();
