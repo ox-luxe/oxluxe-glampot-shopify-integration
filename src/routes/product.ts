@@ -32,9 +32,10 @@ function productRoute() {
         process.env.GLAMPOT_STORE_ACCESS_TOKEN!
       );
       
-      const correspondingGlampotProductId = await OneToOneProductMapping.find(productWebhook.id);
-      if (correspondingGlampotProductId) {
-        await glampotShopifyStore.deleteProduct({ ...productWebhook, correspondingGlampotProductId });
+      const uniqueProductMapping = await OneToOneProductMapping.find(productWebhook.id);
+      
+      if (uniqueProductMapping) {
+        await glampotShopifyStore.deleteProduct({ ...productWebhook, correspondingGlampotProductId: uniqueProductMapping.glampot_product_id });
       }
       res.status(204).send();
     })

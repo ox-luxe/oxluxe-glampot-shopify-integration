@@ -180,8 +180,9 @@ export class ShopifyStore {
           },
         },
       });
+      
       // @ts-ignore
-      console.log("Product id: "+productData.correspondingGlampotProductId + " deleted from "+ res.body.data.productDelete.shop.name);
+      console.log("Corresponding Product id: "+productData.correspondingGlampotProductId + " deleted from "+ res.body.data.productDelete.shop.name);
       await OneToOneProductMapping.delete(productData.id);
       
     } catch (error) {
