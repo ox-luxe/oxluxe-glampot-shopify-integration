@@ -13,12 +13,19 @@ function productRoute() {
   );
 
   router
-    .route("/glampot")
+    .route("/")
     .post(
       productControllers.createNewProduct,
       productControllers.updateProduct,
       productControllers.deleteProduct,
     );
+
+  router
+    .route("/delete")
+    .post((req, res) => {
+      console.log('DELETING PRODUCT');
+      res.status(204).send();
+    })
 
   return router;
 }
