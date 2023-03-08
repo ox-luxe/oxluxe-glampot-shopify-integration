@@ -17,13 +17,7 @@ function productRoute() {
     .post(
       productControllers.createNewProduct,
       productControllers.updateProduct,
-      (req, res) => {
-        if (res.locals.productWebhookType === "delete") {
-          console.log("product deleted.");
-          
-          res.status(204).send();
-        }
-      }
+      productControllers.deleteProduct,
     );
 
   return router;

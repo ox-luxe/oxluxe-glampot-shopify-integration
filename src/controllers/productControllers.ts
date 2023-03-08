@@ -62,11 +62,35 @@ async function updateProduct(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function deleteProduct(req: Request, res: Response, next: NextFunction) {
+  if (res.locals.productWebhookType !== "delete") {
+    return next();
+  }
+
+  try {
+      let productWebhook = res.locals.productWebhook;
+
+      const glampotShopifyStore = new ShopifyStore(
+        process.env.GLAMPOT_STORE_NAME!,
+        process.env.GLAMPOT_STORE_ACCESS_TOKEN!
+      );
+      
+      const correspondingGlampotProductId = res.locals.oneToOneProductMapping.glampot_product_id;
+      await glampotShopifyStore.deleteProduct({ ...productWebhook, correspondingGlampotProductId });
+    
+    res.status(204).send();
+  } catch (error) {
+    console.log(error);
+    res.status(500).send();
+  }
+}
+
 
 
 const productControllers = {
   createNewProduct,
   updateProduct,
+  deleteProduct,
 };
 
 export { productControllers };

@@ -152,6 +152,42 @@ export class ShopifyStore {
       console.log(error);     
     }
   }
+  async deleteProduct(productData: ProductData) {
+    const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
+    
+    // we want to delete the corresponding glampot product.
+    const correspondingGlampotProductId = `gid://shopify/Product/${productData.correspondingGlampotProductId}`;
+    
+    try {
+      const res = await client.query({
+        data: {
+          query: `mutation productDelete($input: ProductDeleteInput!) {
+            productDelete(input: $input) {
+              deletedProductId
+              shop {
+                name
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }`,
+          variables: {
+            input: {
+              id: correspondingGlampotProductId
+            }
+          },
+        },
+      });
+      // @ts-ignore
+      console.log("Product id: "+productData.correspondingGlampotProductId + " deleted from "+ res.body.data.productDelete.shop.name);
+      await OneToOneProductMapping.delete(productData.id);
+      
+    } catch (error) {
+      console.log(error);   
+    }
+  }
   async findProductIdBySku(skuNumber: string) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
     const QUERY_STRING = `{

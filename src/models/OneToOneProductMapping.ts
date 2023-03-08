@@ -30,4 +30,15 @@ export class OneToOneProductMapping {
       console.log(error);
     }
   }
+
+  static async delete(oxluxeProductId: number) {
+    try {
+      let sql = `delete from one_to_one_product_mapping where oxluxe_product_id=${oxluxeProductId};`;
+      let result = await db.execute(sql);
+      return result;
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
