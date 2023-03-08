@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ShopifyStore } from "../services/ShopifyStore";
+import { OneToOneProductMapping } from "../models/OneToOneProductMapping";
 
 export async function verifyWebhookType(
   req: Request,
@@ -7,34 +8,29 @@ export async function verifyWebhookType(
   next: NextFunction
 ) {
   try {
-    const glampotShopifyStore = new ShopifyStore(
-      process.env.GLAMPOT_STORE_NAME!,
-      process.env.GLAMPOT_STORE_ACCESS_TOKEN!
-    );
     // res.locals.productWebhook came from previous middleware: extractProductWebhookForFurtherProcessing
     let productWebhook = res.locals.productWebhook;
-    const sku = ShopifyStore.getSkuNumberFromProductWebhook(productWebhook);
-    const correspondingGlampotProductId = await glampotShopifyStore.findProductIdBySku(sku);
+  
+    const oneToOneProductMapping = await OneToOneProductMapping.find(productWebhook.id);
     const hasGlampotTag = ShopifyStore.doesProductWebhookContainTag(productWebhook, "Glampot");
     
-    console.log(productWebhook.title + " sku: " + sku);
-    console.log(correspondingGlampotProductId);
+    console.log(oneToOneProductMapping);
     console.log(hasGlampotTag);
 
-    if (correspondingGlampotProductId && hasGlampotTag) {
+    if (oneToOneProductMapping && hasGlampotTag) {
       // these variables are used in the updateProduct controller
       res.locals.productWebhookType = "update";
-      res.locals.correspondingGlampotProductId = correspondingGlampotProductId;
+      res.locals.oneToOneProductMapping = oneToOneProductMapping;
     }
-    if (!correspondingGlampotProductId && hasGlampotTag) {
+    if (!oneToOneProductMapping && hasGlampotTag) {
       res.locals.productWebhookType = "create";
     }
-    if (correspondingGlampotProductId && !hasGlampotTag) {
+    if (oneToOneProductMapping && !hasGlampotTag) {
       // these variables are used in the deleteProduct controller
       res.locals.productWebhookType = "delete";
-      res.locals.correspondingGlampotProductId = correspondingGlampotProductId;
+      res.locals.oneToOneProductMapping = oneToOneProductMapping;
     }
-    if (!correspondingGlampotProductId && !hasGlampotTag) {
+    if (!oneToOneProductMapping && !hasGlampotTag) {
       res.status(204).send();
     }
 

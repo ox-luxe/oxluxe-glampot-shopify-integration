@@ -51,7 +51,7 @@ async function updateProduct(req: Request, res: Response, next: NextFunction) {
       
       const variantId = ShopifyStore.getVariantIdFromProductCreateWebhook(productWebhook);
       const productCost = await oxluxeShopifyStore.findCostOfProductByVariantId(variantId);
-      const correspondingGlampotProductId = res.locals.correspondingGlampotProductId;
+      const correspondingGlampotProductId = res.locals.oneToOneProductMapping.glampot_product_id;
       
       await glampotShopifyStore.updateProduct({ ...productWebhook, productCost, correspondingGlampotProductId });
     

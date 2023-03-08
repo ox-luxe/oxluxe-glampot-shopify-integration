@@ -1,5 +1,6 @@
 import { ProductCreateWebhook } from "../interface/productCreateWebhook.interface";
 import Shopify from "@shopify/shopify-api";
+import { OneToOneProductMapping } from "../models/OneToOneProductMapping";
 
 interface ProductData extends ProductCreateWebhook {
   productCost: string;
@@ -115,8 +116,10 @@ export class ShopifyStore {
           },
         },
       });
-      // console.log(res.body);
-      
+      // @ts-ignore
+      const correspondingGlampotProductId = res.body.data.productCreate.product.id.split("/").slice(-1)[0];
+      await OneToOneProductMapping.save(productData.id, correspondingGlampotProductId);
+
     } catch (error) {
       console.log(error);
     }
@@ -126,7 +129,7 @@ export class ShopifyStore {
     const productAttributes = this.convertProductWebhookIntoProductInput(productData);
 
     // we want to update corresponding glampot product and not the origin product, hence updating the product id attribute. 
-    productAttributes.id = productData.correspondingGlampotProductId!;
+    productAttributes.id = `gid://shopify/Product/${productData.correspondingGlampotProductId}`;
     
     try {
       const res = await client.query({

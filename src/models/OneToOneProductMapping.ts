@@ -4,9 +4,16 @@ export class OneToOneProductMapping {
   constructor() {
   }
 
-  async save() {
+  static async save(oxluxeProductId: number, glampotProductId: string) {
     try {
-      
+        let sql =  `INSERT INTO 
+        \`glampot_integration\`.\`one_to_one_product_mapping\` 
+          (\`oxluxe_product_id\`, \`glampot_product_id\`) 
+        VALUES 
+          ('${oxluxeProductId}', '${glampotProductId}');`;
+        let result = await db.execute(sql);
+        console.log(result);
+        
     } catch (error) {
       console.log(error);
     }
