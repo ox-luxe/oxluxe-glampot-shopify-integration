@@ -26,17 +26,16 @@ function productRoute() {
     .route("/delete")
     .post(async (req, res) => {
       let productWebhook = res.locals.productWebhook;
-      console.log(productWebhook.id);
-      console.log('DELETING PRODUCT');
-      // all we have in the productWebhook is the id
-
-      // if the product is deleted, we will not be able to find the product listing anymore hence no tag info
-
-      // we will then proceed to find if there is an associated glampot product id in the DB
-
-      // if there is, delete the corresponding glampot product
-
-      // if there isn't, do nothing.
+      
+      const glampotShopifyStore = new ShopifyStore(
+        process.env.GLAMPOT_STORE_NAME!,
+        process.env.GLAMPOT_STORE_ACCESS_TOKEN!
+      );
+      
+      const correspondingGlampotProductId = await OneToOneProductMapping.find(productWebhook.id);
+      if (correspondingGlampotProductId) {
+        await glampotShopifyStore.deleteProduct({ ...productWebhook, correspondingGlampotProductId });
+      }
       res.status(204).send();
     })
 
