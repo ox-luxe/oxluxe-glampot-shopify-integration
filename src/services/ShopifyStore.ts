@@ -11,6 +11,7 @@ interface ProductData extends ProductCreateWebhook {
 async function convertSGDtoMYR(sgd: string) {
   const response = await fetch('https://open.er-api.com/v6/latest/SGD');
   const body = await response.json();
+  // @ts-ignore
   const convertedAmount: number = Number(sgd) * body.rates.MYR;
   return convertedAmount.toFixed(2);
 }
