@@ -47,7 +47,7 @@ export class ShopifyStore {
       descriptionHtml: body_html,
       productType: product_type,
       vendor: vendor,
-      status: status.toUpperCase(),
+      status: "DRAFT",
       tags: ["Ox Luxe's Product"],
       images: images.map(function(img) {
         return { src: img.src }
