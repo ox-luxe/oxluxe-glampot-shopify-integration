@@ -39,7 +39,7 @@ export class ShopifyStore {
   }
 
   convertProductWebhookIntoProductInput(productData: ProductData) {
-    const { title, body_html, vendor, product_type, status, tags, images, variants, productCost, id } = productData;
+    const { title, body_html, vendor, product_type, status, images, variants, productCost, id } = productData;
 
     let productInput = {
       id: `gid://shopify/Product/${id}`, // this id exists for productUpdates
@@ -48,7 +48,7 @@ export class ShopifyStore {
       productType: product_type,
       vendor: vendor,
       status: status.toUpperCase(),
-      tags: [tags],
+      tags: ["Ox Luxe's Product"],
       images: images.map(function(img) {
         return { src: img.src }
        }),
