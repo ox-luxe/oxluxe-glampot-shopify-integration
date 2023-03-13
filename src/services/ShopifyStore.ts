@@ -51,7 +51,7 @@ export class ShopifyStore {
     return webhookData.variants[0].sku;
   }
 
-  convertProductWebhookIntoProductInput(productData: ProductData) {
+  async convertProductWebhookIntoProductInput(productData: ProductData) {
     const { title, body_html, vendor, product_type, status, images, variants, productCost, id } = productData;
 
     let productInput = {
@@ -65,18 +65,19 @@ export class ShopifyStore {
       images: images.map(function(img) {
         return { src: img.src }
        }),
-      variants: variants.map(function(variant) {
+      variants: await Promise.all(variants.map(async function(variant) {
+        const price = await convertSGDtoMYR(variant.price);    
         return {
-          price: variant.price,
+          price: price,
           sku: variant.sku,
           inventoryManagement: variant.inventory_management.toUpperCase(),
-          inventoryItem: { cost: productCost, tracked: true },
+          inventoryItem: { cost: await convertSGDtoMYR(productCost), tracked: true },
           inventoryQuantities: {
             availableQuantity: variant.inventory_quantity,
             locationId: `gid://shopify/Location/${process.env.GLAMPOT_STORE_LOCATION_ID}`,          
           }
         }
-      }),
+      })),
     };
     return productInput;
   }
@@ -111,7 +112,7 @@ export class ShopifyStore {
   }
   async createProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
-    const productAttributes = this.convertProductWebhookIntoProductInput(productData);
+    const productAttributes = await this.convertProductWebhookIntoProductInput(productData);
 
     try {
       const res = await client.query({
@@ -139,7 +140,7 @@ export class ShopifyStore {
   }
   async updateProduct(productData: ProductData) {
     const client = new Shopify.Clients.Graphql(this.storeUrl, this.accessToken);
-    const productAttributes = this.convertProductWebhookIntoProductInput(productData);
+    const productAttributes = await this.convertProductWebhookIntoProductInput(productData);
 
     // we want to update corresponding glampot product and not the origin product, hence updating the product id attribute. 
     productAttributes.id = `gid://shopify/Product/${productData.correspondingGlampotProductId}`;
