@@ -8,11 +8,15 @@ interface ProductData extends ProductCreateWebhook {
   correspondingGlampotProductId?: string;
 }
 
+async function getConversionRatesForSGD(): Promise<any> {
+  const api = 'https://open.er-api.com/v6/latest/SGD';
+  const response = await fetch(api);
+  return await response.json();
+}
+
 async function convertSGDtoMYR(sgd: string) {
-  const response = await fetch('https://open.er-api.com/v6/latest/SGD');
-  const body = await response.json();
-  // @ts-ignore
-  const convertedAmount: number = Number(sgd) * body.rates.MYR;
+  const conversionRatesForSGD = await getConversionRatesForSGD();
+  const convertedAmount = Number(sgd) * conversionRatesForSGD.rates.MYR;
   return convertedAmount.toFixed(2);
 }
 
