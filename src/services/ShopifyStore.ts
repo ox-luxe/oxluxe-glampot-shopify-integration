@@ -20,6 +20,10 @@ async function convertSGDtoMYR(sgd: string) {
   return convertedAmount.toFixed(2);
 }
 
+function increaseByTwentyPercent(amount: string) {
+  return (Number(amount) * 1.2).toFixed(2);
+}
+
 export class ShopifyStore {
   storeUrl: string;
   accessToken: string;
@@ -71,7 +75,7 @@ export class ShopifyStore {
           price: price,
           sku: variant.sku,
           inventoryManagement: variant.inventory_management.toUpperCase(),
-          inventoryItem: { cost: await convertSGDtoMYR(productCost), tracked: true },
+          inventoryItem: { cost: await convertSGDtoMYR(increaseByTwentyPercent(productCost)), tracked: true },
           inventoryQuantities: {
             availableQuantity: variant.inventory_quantity,
             locationId: `gid://shopify/Location/${process.env.GLAMPOT_STORE_LOCATION_ID}`,          
